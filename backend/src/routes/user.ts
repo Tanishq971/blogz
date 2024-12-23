@@ -11,6 +11,8 @@ export const userRoutes = new Hono<{
   };
 }>();
 
+
+
 userRoutes.post("/signup", async (c) => {
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
@@ -74,3 +76,28 @@ userRoutes.post("/signin", async (c) => {
     return c.text("Internal server error");
   }
 });
+
+
+userRoutes.get('/details' , async (c) => {
+      try{
+        const prisma = new PrismaClient({
+          datasourceUrl: c.env.DATABASE_URL,
+        }).$extends(withAccelerate());
+
+          const data = await prisma.user.findFirst({
+            where:{
+              email:{
+                endsWith:'gmail.com'
+              }
+            }
+          })
+
+          c.status(200);
+          return c.json(data);
+
+      }catch(e){
+          console.error(e);
+          c.status(500);
+          return c.text('Internal server error');
+      }
+})
